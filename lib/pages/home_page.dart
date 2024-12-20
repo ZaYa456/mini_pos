@@ -5,6 +5,8 @@ import 'package:mini_pos/pages/checkout_page.dart';
 import 'add_product_form.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -13,11 +15,11 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   // Pages to navigate between
-  static List<Widget> _pages = <Widget>[
-    ProductsPage(),
-    CheckoutPage(),
+  static final List<Widget> _pages = <Widget>[
+    const ProductsPage(),
+    const CheckoutPage(),
     Center(child: Text('Sales Page', style: TextStyle(fontSize: 24))),
-    ProfilePage(),
+    const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -38,7 +40,7 @@ class _HomePageState extends State<HomePage> {
               // Navigate to the AddProductForm page
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddProductForm()),
+                MaterialPageRoute(builder: (context) => const AddProductForm()),
               );
             },
             tooltip: 'Add Product',

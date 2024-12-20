@@ -3,7 +3,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:barcode_scan2/barcode_scan2.dart';
 
+import '../session_management/session_getter.dart';
+import '../utils/display_modal.dart';
+
 class AddProductForm extends StatefulWidget {
+  const AddProductForm({super.key});
+
   @override
   _AddProductFormState createState() => _AddProductFormState();
 }
@@ -43,14 +48,21 @@ class _AddProductFormState extends State<AddProductForm> {
           setState(() {
             _categories = data['categories'];
           });
+        } else {
+          displayModal(context,
+              title: 'Error.',
+              message: data['message'],
+              backgroundColor: Colors.red);
         }
       } else {
-        // Handle error
-        throw Exception('Failed to load categories');
+        displayModal(context,
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
+            backgroundColor: Colors.red);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
     }
   }
 
@@ -59,8 +71,11 @@ class _AddProductFormState extends State<AddProductForm> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save(); // Save the form inputs
 
+      String sessionId = await getSessionId() ?? '';
+
       // Construct the data to be sent to the PHP backend
       var data = {
+        'sessionId': sessionId,
         'name': _name,
         'price': _price.toString(),
         'barcode': _barcode,
@@ -89,19 +104,25 @@ class _AddProductFormState extends State<AddProductForm> {
           var result = json.decode(response.body);
           // Handle successful submission
           if (result['success'] == true) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(result['message'])));
+            displayModal(context,
+                title: 'Success.',
+                message: result['message'],
+                backgroundColor: Colors.green);
           } else {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(result['message'])));
+            displayModal(context,
+                title: 'Error.',
+                message: result['message'],
+                backgroundColor: Colors.red);
           }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Error ${response.statusCode}: Server Error')));
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
       } finally {
         setState(() {
           _isSubmitting = false;
@@ -114,30 +135,30 @@ class _AddProductFormState extends State<AddProductForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Product'),
+        title: const Text('Add New Product'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: <Widget>[
               TextFormField(
-                decoration: InputDecoration(labelText: 'Product Name'),
+                decoration: const InputDecoration(labelText: 'Product Name'),
                 onSaved: (value) => _name = value!,
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a name' : null,
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Price'),
+                decoration: const InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
                 onSaved: (value) => _price = double.parse(value!),
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a price' : null,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Category', // Optional, can also be a hint
                 ),
                 value: _selectedCategory,
@@ -159,18 +180,18 @@ class _AddProductFormState extends State<AddProductForm> {
                   );
                 }).toList(),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text('Barcode: $_barcode'),
               ElevatedButton(
                 onPressed: _scanBarcode,
-                child: Text('Scan Barcode'),
+                child: const Text('Scan Barcode'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _isSubmitting
-                  ? Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
                       onPressed: _submitForm,
-                      child: Text('Add Product'),
+                      child: const Text('Add Product'),
                     ),
             ],
           ),

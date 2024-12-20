@@ -2,23 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mini_pos/utils/display_modal.dart';
 import 'dart:convert'; // For JSON encoding and decoding
-import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences to store the server's session id
 import 'pages/home_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: LoginPage(),
     );
   }
 }
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -55,41 +59,29 @@ class _LoginPageState extends State<LoginPage> {
             // Navigate to HomePage on successful login
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(builder: (context) => const HomePage()),
             );
           } else {
-            // Display error message
             displayModal(context,
                 title: 'Error.',
                 message: result['message'],
                 backgroundColor: Colors.red);
-            // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            //   content: Text('Error'),
-            // ));
           }
         } else {
-          // Display error message
           displayModal(context,
               title: 'Error.',
               message: result['message'],
               backgroundColor: Colors.red);
-          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          //   content: Text(result['message']),
-          // ));
         }
       } else {
         displayModal(context,
-            title: 'Server error.',
-            message: 'Please try again later.',
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
             backgroundColor: Colors.red);
-        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        //   content: Text('Server error. Please try again later.'),
-        // ));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: $e'),
-      ));
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
     } finally {
       setState(() {
         _isLoading = false;
@@ -107,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -134,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Password',
                     prefixIcon: Icon(Icons.lock),
                   ),
@@ -149,9 +141,9 @@ class _LoginPageState extends State<LoginPage> {
                     _password = value;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _isLoading
-                    ? CircularProgressIndicator()
+                    ? const CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {

@@ -4,7 +4,11 @@ import 'dart:convert';
 
 import 'package:mini_pos/session_management/session_getter.dart';
 
+import '../utils/display_modal.dart';
+
 class ProductsPage extends StatefulWidget {
+  const ProductsPage({super.key});
+
   @override
   _ProductsPageState createState() => _ProductsPageState();
 }
@@ -56,13 +60,21 @@ class _ProductsPageState extends State<ProductsPage> {
           setState(() {
             _products = data['products'];
           });
+        } else {
+          displayModal(context,
+              title: 'Error.',
+              message: data['message'],
+              backgroundColor: Colors.red);
         }
       } else {
-        throw Exception("Error fetching products");
+        displayModal(context,
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
+            backgroundColor: Colors.red);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
     }
   }
 
@@ -79,13 +91,21 @@ class _ProductsPageState extends State<ProductsPage> {
             _categories.addAll(data['categories'].map((category) =>
                 {"id": category['id'], "name": category['name']}));
           });
+        } else {
+          displayModal(context,
+              title: 'Error.',
+              message: data['message'],
+              backgroundColor: Colors.red);
         }
       } else {
-        throw Exception('Failed to load categories');
+        displayModal(context,
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
+            backgroundColor: Colors.red);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
     }
   }
 
@@ -97,7 +117,7 @@ class _ProductsPageState extends State<ProductsPage> {
 
     _scrollController.animateTo(
       position,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
   }

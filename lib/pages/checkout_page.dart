@@ -3,8 +3,11 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../session_management/session_getter.dart';
+import '../utils/display_modal.dart';
 
 class CheckoutPage extends StatefulWidget {
+  const CheckoutPage({super.key});
+
   @override
   _CheckoutPageState createState() => _CheckoutPageState();
 }
@@ -34,61 +37,72 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future<void> fetchProductInfo(String barcode) async {
-    String sessionId = await getSessionId() ?? '';
-    final response = await http.post(
-      Uri.parse('http://192.168.1.13/mini_pos/backend/getProducts.php'),
-      body: json.encode({'sessionId': sessionId, 'barcode': barcode}),
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      String sessionId = await getSessionId() ?? '';
+      final response = await http.post(
+        Uri.parse('http://192.168.1.13/mini_pos/backend/getProducts.php'),
+        body: json.encode({'sessionId': sessionId, 'barcode': barcode}),
+        headers: {'Content-Type': 'application/json'},
+      );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
 
-      if (data['success'] == true) {
-        setState(() {
-          // Check if the product already exists in the list
-          final existingProductIndex = scannedProducts.indexWhere(
-            (item) => item['id'] == data['product']['id'],
-          );
-
-          if (existingProductIndex != -1) {
-            // Update the quantity if the product already exists
-            scannedProducts[existingProductIndex]['quantity'] =
-                (scannedProducts[existingProductIndex]['quantity'] ?? 1) + 1;
-
-            total += double.parse(
-                scannedProducts[existingProductIndex]['price'].toString());
-
-            // Remove the item and reinsert it to update the AnimatedList
-            _listKey.currentState?.removeItem(
-              existingProductIndex,
-              (context, animation) =>
-                  _buildProductItem(context, existingProductIndex, animation),
-              duration: const Duration(milliseconds: 300),
+        if (data['success'] == true) {
+          setState(() {
+            // Check if the product already exists in the list
+            final existingProductIndex = scannedProducts.indexWhere(
+              (item) => item['id'] == data['product']['id'],
             );
 
-            _listKey.currentState?.insertItem(existingProductIndex);
-          } else {
-            scannedProducts.add(data['product']);
-            total += double.parse(data['product']['price'].toString());
+            if (existingProductIndex != -1) {
+              // Update the quantity if the product already exists
+              scannedProducts[existingProductIndex]['quantity'] =
+                  (scannedProducts[existingProductIndex]['quantity'] ?? 1) + 1;
 
-            // Notify the AnimatedList of the new item
-            _listKey.currentState?.insertItem(scannedProducts.length - 1);
-          }
-        });
+              total += double.parse(
+                  scannedProducts[existingProductIndex]['price'].toString());
 
-        // Trigger the flash blink animation
-        blinkFlash();
+              // Remove the item and reinsert it to update the AnimatedList
+              _listKey.currentState?.removeItem(
+                existingProductIndex,
+                (context, animation) =>
+                    _buildProductItem(context, existingProductIndex, animation),
+                duration: const Duration(milliseconds: 300),
+              );
+
+              _listKey.currentState?.insertItem(existingProductIndex);
+            } else {
+              scannedProducts.add(data['product']);
+              total += double.parse(data['product']['price'].toString());
+
+              // Notify the AnimatedList of the new item
+              _listKey.currentState?.insertItem(scannedProducts.length - 1);
+            }
+          });
+
+          // Trigger the flash blink animation
+          blinkFlash();
+        } else {
+          displayModal(context,
+              title: 'Error.',
+              message: data['message'],
+              backgroundColor: Colors.red);
+        }
       } else {
-        print("Product not found..........");
+        displayModal(context,
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
+            backgroundColor: Colors.red);
       }
-    } else {
-      print("Server error");
-    }
 
-    // Add a short delay before resuming scanning
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => isScanning = true); // Resume scanning after delay
+      // Add a short delay before resuming scanning
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() => isScanning = true); // Resume scanning after delay
+    } catch (e) {
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    }
   }
 
   void blinkFlash() async {
@@ -169,11 +183,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
               children: [
                 Text(
                   "Quantity: ${product['quantity'] ?? 1}",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Spacer(),
+                const Spacer(),
                 IconButton(
-                  icon: Icon(Icons.add, color: Colors.green),
+                  icon: const Icon(Icons.add, color: Colors.green),
                   onPressed: () {
                     setState(() {
                       product['quantity'] = (product['quantity'] ?? 1) + 1;
@@ -183,7 +197,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.remove, color: Colors.red),
+                  icon: const Icon(Icons.remove, color: Colors.red),
                   onPressed: () {
                     if ((product['quantity'] ?? 1) > 1) {
                       setState(() {
@@ -198,7 +212,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.delete, color: Colors.red),
+          icon: const Icon(Icons.delete, color: Colors.red),
           onPressed: () => removeProduct(index),
         ),
       ),
@@ -206,30 +220,39 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future<void> handleCheckout() async {
-    String sessionId = await getSessionId() ?? '';
-    final response = await http.post(
-      Uri.parse('http://192.168.1.13/mini_pos/backend/checkout.php'),
-      body: json.encode({'sessionId': sessionId, 'products': scannedProducts}),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['success'] == true) {
-        // Clear the list on successful checkout
-        removeAllProducts();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Checkout successful!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Checkout failed. Try again.')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Server error during checkout.')),
+    try {
+      String sessionId = await getSessionId() ?? '';
+      final response = await http.post(
+        Uri.parse('http://192.168.1.13/mini_pos/backend/checkout.php'),
+        body:
+            json.encode({'sessionId': sessionId, 'products': scannedProducts}),
+        headers: {'Content-Type': 'application/json'},
       );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          // Uncomment the following statement if you prefer to clear the products list on successful checkout
+          // removeAllProducts();
+          displayModal(context,
+              title: 'Success.',
+              message: data['message'],
+              backgroundColor: Colors.green);
+        } else {
+          displayModal(context,
+              title: 'Error.',
+              message: data['message'],
+              backgroundColor: Colors.red);
+        }
+      } else {
+        displayModal(context,
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
+            backgroundColor: Colors.red);
+      }
+    } catch (e) {
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
     }
   }
 

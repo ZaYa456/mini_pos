@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../session_management/session_getter.dart';
+import '../utils/display_modal.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -30,9 +33,10 @@ class _ProfilePageState extends State<ProfilePage> {
   // Function to submit the username form
   Future<void> _changeUsername() async {
     if (_newUsernameController.text != _confirmUsernameController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Confirm new username error')),
-      );
+      displayModal(context,
+          title: 'Error.',
+          message: 'The username\'s confirmation is not identical.',
+          backgroundColor: Colors.red);
       return;
     }
 
@@ -50,28 +54,35 @@ class _ProfilePageState extends State<ProfilePage> {
         var result = json.decode(response.body);
         // Handle successful submission
         if (result['success'] == true) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(result['message'])));
+          displayModal(context,
+              title: 'Success.',
+              message: result['message'],
+              backgroundColor: Colors.green);
         } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(result['message'])));
+          displayModal(context,
+              title: 'Error.',
+              message: result['message'],
+              backgroundColor: Colors.red);
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Error ${response.statusCode}: Server Error')));
+        displayModal(context,
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
+            backgroundColor: Colors.red);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
     }
   }
 
   // Function to submit the password form
   Future<void> _changePassword() async {
     if (_newPasswordController.text != _confirmNewPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Confirm new password error')),
-      );
+      displayModal(context,
+          title: 'Error.',
+          message: 'The password\'s confirmation is not identical.',
+          backgroundColor: Colors.red);
       return;
     }
 
@@ -89,80 +100,86 @@ class _ProfilePageState extends State<ProfilePage> {
         var result = json.decode(response.body);
         // Handle successful submission
         if (result['success'] == true) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(result['message'])));
+          displayModal(context,
+              title: 'Success.',
+              message: result['message'],
+              backgroundColor: Colors.green);
         } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(result['message'])));
+          displayModal(context,
+              title: 'Error.',
+              message: result['message'],
+              backgroundColor: Colors.red);
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Error ${response.statusCode}: Server Error')));
+        displayModal(context,
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
+            backgroundColor: Colors.red);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Admin Settings')),
+      appBar: AppBar(title: const Text('Admin Settings')),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Username change form
-              Text('Change Username', style: TextStyle(fontSize: 18)),
+              const Text('Change Username', style: TextStyle(fontSize: 18)),
               TextField(
                 controller: _currentUsernameController,
-                decoration: InputDecoration(labelText: 'Current Username'),
+                decoration: const InputDecoration(labelText: 'Current Username'),
               ),
               TextField(
                 controller: _newUsernameController,
-                decoration: InputDecoration(labelText: 'New Username'),
+                decoration: const InputDecoration(labelText: 'New Username'),
               ),
               TextField(
                 controller: _confirmUsernameController,
-                decoration: InputDecoration(labelText: 'Confirm New Username'),
+                decoration: const InputDecoration(labelText: 'Confirm New Username'),
               ),
               TextField(
                 controller: _passwordForUsernameController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: _changeUsername,
                 child: const Text('Update Username'),
               ),
-              Divider(),
+              const Divider(),
 
               // Password change form
-              Text('Change Password', style: TextStyle(fontSize: 18)),
+              const Text('Change Password', style: TextStyle(fontSize: 18)),
               TextField(
                 controller: _usernameForPasswordController,
-                decoration: InputDecoration(labelText: 'Username'),
+                decoration: const InputDecoration(labelText: 'Username'),
               ),
               TextField(
                 controller: _currentPasswordController,
-                decoration: InputDecoration(labelText: 'Current Password'),
+                decoration: const InputDecoration(labelText: 'Current Password'),
                 obscureText: true,
               ),
               TextField(
                 controller: _newPasswordController,
-                decoration: InputDecoration(labelText: 'New Password'),
+                decoration: const InputDecoration(labelText: 'New Password'),
                 obscureText: true,
               ),
               TextField(
                 controller: _confirmNewPasswordController,
-                decoration: InputDecoration(labelText: 'Confirm New Password'),
+                decoration: const InputDecoration(labelText: 'Confirm New Password'),
                 obscureText: true,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: _changePassword,
                 child: const Text('Update Password'),
