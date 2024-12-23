@@ -5,10 +5,10 @@ try {
     {
         return htmlspecialchars(trim(stripslashes($data)));
     }
-    
+
     // Read raw POST data from Flutter and decode it
     $data = json_decode(file_get_contents("php://input"), true);
-    
+
     //Start a session to check $_SESSION['AdminName']
     session_id($data["sessionId"] ?? "");
     session_start();
@@ -16,7 +16,7 @@ try {
         echo json_encode(["message" => "Error: You are not logged in", "success" => false]);
         exit;
     }
-    
+
     if (isset($data["search"]) && isset($data["categoryID"]) && isset($data["sort"])) {
 
         $errors = [];
@@ -55,6 +55,19 @@ try {
 
         $stmt = $conn->prepare("SELECT products.id, products.name AS products_name, products.price, products.barcode, categories.name AS category_name FROM products INNER JOIN categories ON products.category_id=categories.id WHERE products.barcode=:barcode");
         $stmt->bindParam("barcode", $barcode);
+        $stmt->execute();
+        if ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $product["quantity"] = 1;
+            echo json_encode(['product' => $product, 'success' => true]);
+        } else {
+            echo json_encode(['message' => 'Product not found', 'success' => false]);
+        }
+    } elseif (isset($data["productID"])) {
+        // Sanitize inputs
+        $productID = testInput($data["productID"]);
+
+        $stmt = $conn->prepare("SELECT products.id, products.name AS product_name, products.price, products.barcode, categories.id AS category_id FROM products INNER JOIN categories ON products.category_id=categories.id WHERE products.id=:productID");
+        $stmt->bindParam("productID", $productID);
         $stmt->execute();
         if ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $product["quantity"] = 1;

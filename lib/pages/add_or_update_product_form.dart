@@ -7,7 +7,8 @@ import '../session_management/session_getter.dart';
 import '../utils/display_modal.dart';
 
 class AddOrUpdateProductForm extends StatefulWidget {
-  const AddOrUpdateProductForm({super.key});
+  final int? productID; // Optional productID
+  const AddOrUpdateProductForm({super.key, this.productID});
 
   @override
   _AddOrUpdateProductFormState createState() => _AddOrUpdateProductFormState();
@@ -26,6 +27,9 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
   void initState() {
     super.initState();
     fetchCategories(); // Fetch categories when the widget is initialized
+    if (widget.productID != null) {
+      fetchProductInfo(widget.productID!);
+    }
   }
 
   @override
@@ -47,7 +51,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
   Future<void> fetchCategories() async {
     try {
       var url =
-          Uri.parse('http://192.168.1.11/mini_pos/backend/getCategories.php');
+          Uri.parse('http://192.168.1.4/mini_pos/backend/getCategories.php');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -55,6 +59,40 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
         if (data['success']) {
           setState(() {
             _categories = data['categories'];
+          });
+        } else {
+          displayModal(context,
+              title: 'Error.',
+              message: data['message'],
+              backgroundColor: Colors.red);
+        }
+      } else {
+        displayModal(context,
+            title: 'Server Error: ${response.statusCode}',
+            message: response.body,
+            backgroundColor: Colors.red);
+      }
+    } catch (e) {
+      displayModal(context,
+          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    }
+  }
+
+  Future<void> fetchProductInfo(int productID) async {
+    try {
+      String sessionId = await getSessionId() ?? '';
+      var url =
+          Uri.parse('http://192.168.1.4/mini_pos/backend/getProducts.php');
+      final response = await http.post(url,
+          body: json.encode({'sessionId': sessionId, 'productID': productID}));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success']) {
+          setState(() {
+            _nameController.text = data['product']['product_name'];
+            _priceController.text = data['product']['price'].toString();
+            _barcodeController.text = data['product']['barcode'];
+            _selectedCategory = data['product']['category_id'].toString();
           });
         } else {
           displayModal(context,
@@ -90,7 +128,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
 
       // Set the PHP endpoint
       var url = Uri.parse(
-          'http://192.168.1.11/mini_pos/backend/addOrUpdateProduct.php');
+          'http://192.168.1.4/mini_pos/backend/addOrUpdateProduct.php');
 
       try {
         setState(() {
@@ -141,7 +179,8 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Product'),
+        title:
+            Text((widget.productID == null) ? 'Add Product' : 'Update Product'),
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -217,7 +256,9 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
                     ? const Center(child: CircularProgressIndicator())
                     : ElevatedButton(
                         onPressed: _isSubmitting ? null : _submitForm,
-                        child: const Text('Add Product'),
+                        child: Text((widget.productID == null)
+                            ? 'Add Product'
+                            : 'Update Product'),
                       ),
               ],
             ),

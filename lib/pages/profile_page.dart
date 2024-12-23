@@ -26,9 +26,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // URL endpoints for PHP files
   final String changeUsernameUrl =
-      'http://192.168.1.11/mini_pos/backend/updateUsername.php';
+      'http://192.168.1.4/mini_pos/backend/updateUsername.php';
   final String changePasswordUrl =
-      'http://192.168.1.11/mini_pos/backend/updatePassword.php';
+      'http://192.168.1.4/mini_pos/backend/updatePassword.php';
 
   // Function to submit the username form
   Future<void> _changeUsername() async {

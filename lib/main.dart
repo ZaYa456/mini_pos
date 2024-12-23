@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   Future<void> login() async {
-    const url = 'http://192.168.1.11/mini_pos/backend/login.php';
+    const url = 'http://192.168.1.4/mini_pos/backend/login.php';
     try {
       setState(() {
         _isLoading = true;
