@@ -39,7 +39,7 @@ class _AddProductFormState extends State<AddProductForm> {
   Future<void> fetchCategories() async {
     try {
       var url =
-          Uri.parse('http://192.168.1.13/mini_pos/backend/getCategories.php');
+          Uri.parse('http://192.168.1.4/mini_pos/backend/getCategories.php');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -84,7 +84,7 @@ class _AddProductFormState extends State<AddProductForm> {
 
       // Set the PHP endpoint
       var url =
-          Uri.parse('http://192.168.1.13/mini_pos/backend/addProduct.php');
+          Uri.parse('http://192.168.1.4/mini_pos/backend/addProduct.php');
 
       try {
         setState(() {

@@ -29,12 +29,14 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  String _username = '';
-  String _password = '';
+  final TextEditingController _usernameController =
+      TextEditingController(text: 'zak');
+  final TextEditingController _passwordController =
+      TextEditingController(text: 'zak');
   bool _isLoading = false;
 
   Future<void> login() async {
-    const url = 'http://192.168.1.13/mini_pos/backend/login.php';
+    const url = 'http://192.168.1.4/mini_pos/backend/login.php';
     try {
       setState(() {
         _isLoading = true;
@@ -44,29 +46,22 @@ class _LoginPageState extends State<LoginPage> {
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
-          "username": _username,
-          "password": _password,
+          "username": _usernameController.text,
+          "password": _passwordController.text,
         }),
       );
 
       if (response.statusCode == 200) {
         final result = json.decode(response.body);
-        if (result['success']) {
+        if (result['success'] && result.containsKey('sessionId')) {
           // Save session ID to SharedPreferences
-          if (result.containsKey('sessionId')) {
-            String sessionId = result['sessionId'];
-            await saveSessionId(sessionId);
-            // Navigate to HomePage on successful login
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
-          } else {
-            displayModal(context,
-                title: 'Error.',
-                message: result['message'],
-                backgroundColor: Colors.red);
-          }
+          String sessionId = result['sessionId'];
+          await saveSessionId(sessionId);
+          // Navigate to HomePage on successful login
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
         } else {
           displayModal(context,
               title: 'Error.',
@@ -95,6 +90,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -110,6 +112,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 TextFormField(
+                  controller: _usernameController,
                   decoration: const InputDecoration(
                     labelText: 'Username',
                     prefixIcon: Icon(Icons.person),
@@ -120,12 +123,10 @@ class _LoginPageState extends State<LoginPage> {
                     }
                     return null;
                   },
-                  onChanged: (value) {
-                    _username = value;
-                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _passwordController,
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     prefixIcon: Icon(Icons.lock),
@@ -137,17 +138,17 @@ class _LoginPageState extends State<LoginPage> {
                     }
                     return null;
                   },
-                  onChanged: (value) {
-                    _password = value;
-                  },
                 ),
                 const SizedBox(height: 20),
                 _isLoading
-                    ? const CircularProgressIndicator()
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: CircularProgressIndicator(),
+                      )
                     : ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            login(); // Call login function when the form is validated
+                            login();
                           }
                         },
                         child: const Text('Login'),

@@ -44,7 +44,7 @@ class _ProductsPageState extends State<ProductsPage> {
     try {
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
-        Uri.parse('http://192.168.1.13/mini_pos/backend/getProducts.php'),
+        Uri.parse('http://192.168.1.4/mini_pos/backend/getProducts.php'),
         body: jsonEncode({
           'sessionId': sessionId,
           'search': search,
@@ -81,7 +81,7 @@ class _ProductsPageState extends State<ProductsPage> {
   Future<void> fetchCategories() async {
     try {
       var url =
-          Uri.parse('http://192.168.1.13/mini_pos/backend/getCategories.php');
+          Uri.parse('http://192.168.1.4/mini_pos/backend/getCategories.php');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {

@@ -15,8 +15,10 @@ Future<void> displayModal(
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: backgroundColor,
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(message),
+        title: Text(title,
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         actions: confirmation
             ? [

@@ -3,6 +3,7 @@ import 'package:mini_pos/pages/products_page.dart';
 import 'package:mini_pos/pages/profile_page.dart';
 import 'package:mini_pos/pages/checkout_page.dart';
 import 'add_product_form.dart';
+import 'sales_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   static final List<Widget> _pages = <Widget>[
     const ProductsPage(),
     const CheckoutPage(),
-    Center(child: Text('Sales Page', style: TextStyle(fontSize: 24))),
+    const SalesPage(),
     const ProfilePage(),
   ];
 
