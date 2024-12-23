@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mini_pos/pages/products_page.dart';
 import 'package:mini_pos/pages/profile_page.dart';
 import 'package:mini_pos/pages/checkout_page.dart';
-import 'add_product_form.dart';
+import 'add_or_update_product_form.dart';
 import 'sales_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -38,10 +38,10 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              // Navigate to the AddProductForm page
+              // Navigate to the AddOrUpdateProductForm page
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddProductForm()),
+                MaterialPageRoute(builder: (context) => const AddOrUpdateProductForm()),
               );
             },
             tooltip: 'Add Product',

@@ -40,7 +40,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     try {
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/mini_pos/backend/getProducts.php'),
+        Uri.parse('http://192.168.1.11/mini_pos/backend/getProducts.php'),
         body: json.encode({'sessionId': sessionId, 'barcode': barcode}),
         headers: {'Content-Type': 'application/json'},
       );
@@ -223,7 +223,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     try {
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/mini_pos/backend/checkout.php'),
+        Uri.parse('http://192.168.1.11/mini_pos/backend/checkout.php'),
         body:
             json.encode({'sessionId': sessionId, 'products': scannedProducts}),
         headers: {'Content-Type': 'application/json'},
