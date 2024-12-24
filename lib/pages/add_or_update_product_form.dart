@@ -22,6 +22,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
   List<dynamic> _categories = [];
   String? _selectedCategory; // Default Category
   bool _isSubmitting = false;
+  bool _isLoadingProductInfo = false;
 
   @override
   void initState() {
@@ -80,6 +81,9 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
 
   Future<void> fetchProductInfo(int productID) async {
     try {
+      setState(() {
+        _isLoadingProductInfo = true;
+      });
       String sessionId = await getSessionId() ?? '';
       var url =
           Uri.parse('http://192.168.1.4/mini_pos/backend/getProducts.php');
@@ -109,6 +113,10 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
     } catch (e) {
       displayModal(context,
           title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    } finally {
+      setState(() {
+        _isLoadingProductInfo = false;
+      });
     }
   }
 
@@ -182,89 +190,101 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
         title:
             Text((widget.productID == null) ? 'Add Product' : 'Update Product'),
       ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: <Widget>[
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Product Name'),
-                  validator: (value) => value!.isEmpty
-                      ? 'Please enter the product\'s name'
-                      : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: _priceController,
-                  decoration: const InputDecoration(labelText: 'Price'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a price';
-                    }
-                    final price = double.tryParse(value);
-                    if (price == null || price <= 0) {
-                      return 'Please enter a valid price';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Category',
-                  ),
-                  value: _selectedCategory,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedCategory = newValue;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select a category';
-                    }
-                    return null;
-                  },
-                  items: _categories.map<DropdownMenuItem<String>>((category) {
-                    return DropdownMenuItem<String>(
-                      value: category['id'].toString(),
-                      child: Text(category['name']),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: _barcodeController,
-                  decoration: InputDecoration(
-                      labelText: 'Barcode',
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.qr_code_scanner),
-                        onPressed: _scanBarcode,
-                      )),
-                  validator: (value) => value!.isEmpty
-                      ? 'Please enter the product\'s barcode'
-                      : null,
-                ),
-                const SizedBox(height: 20),
-                _isSubmitting
-                    ? const Center(child: CircularProgressIndicator())
-                    : ElevatedButton(
-                        onPressed: _isSubmitting ? null : _submitForm,
-                        child: Text((widget.productID == null)
-                            ? 'Add Product'
-                            : 'Update Product'),
+      body: _isLoadingProductInfo
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : GestureDetector(
+              onTap: () => FocusScope.of(context)
+                  .unfocus(), // Dismiss the keyboard when the user taps outside the form
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    children: <Widget>[
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _nameController,
+                        decoration:
+                            const InputDecoration(labelText: 'Product Name'),
+                        validator: (value) => value!.isEmpty
+                            ? 'Please enter the product\'s name'
+                            : null,
                       ),
-              ],
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _priceController,
+                        decoration: const InputDecoration(labelText: 'Price'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a price';
+                          }
+                          final price = double.tryParse(value);
+                          if (price == null || price <= 0) {
+                            return 'Please enter a valid price';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                        ),
+                        value: _selectedCategory,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedCategory = newValue;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please select a category';
+                          }
+                          return null;
+                        },
+                        items: _categories
+                            .map<DropdownMenuItem<String>>((category) {
+                          return DropdownMenuItem<String>(
+                            value: category['id'].toString(),
+                            child: Text(category['name']),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _barcodeController,
+                        decoration: InputDecoration(
+                            labelText: 'Barcode',
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.qr_code_scanner),
+                              onPressed: _scanBarcode,
+                            )),
+                        validator: (value) => value!.isEmpty
+                            ? 'Please enter the product\'s barcode'
+                            : null,
+                      ),
+                      const SizedBox(height: 20),
+                      _isSubmitting
+                          ? const Center(
+                              child: SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircularProgressIndicator()),
+                            )
+                          : ElevatedButton(
+                              onPressed: _isSubmitting ? null : _submitForm,
+                              child: Text((widget.productID == null)
+                                  ? 'Add Product'
+                                  : 'Update Product'),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

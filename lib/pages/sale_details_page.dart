@@ -22,7 +22,7 @@ class SaleDetailsPage extends StatefulWidget {
 
 class _SaleDetailsPageState extends State<SaleDetailsPage> {
   List<Map<String, dynamic>>? _saleDetails;
-  bool _isLoading = true;
+  bool _isLoadingSaleDetails = true;
 
   @override
   void initState() {
@@ -32,6 +32,9 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
 
   Future<void> fetchSaleDetails() async {
     try {
+      setState(() {
+        _isLoadingSaleDetails = true;
+      });
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
         Uri.parse('http://192.168.1.4/mini_pos/backend/getSales.php'),
@@ -40,12 +43,10 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
       );
 
       if (response.statusCode == 200) {
-        print(response.body);
         final data = json.decode(response.body);
         if (data['success']) {
           setState(() {
             _saleDetails = List<Map<String, dynamic>>.from(data['sale']);
-            _isLoading = false;
           });
         } else {
           displayModal(context,
@@ -62,6 +63,10 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
     } catch (e) {
       displayModal(context,
           title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    }finally {
+      setState(() {
+        _isLoadingSaleDetails = false;
+      });
     }
   }
 
@@ -71,7 +76,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
       appBar: AppBar(
         title: const Text('Sale Details'),
       ),
-      body: _isLoading
+      body: _isLoadingSaleDetails
           ? const Center(child: CircularProgressIndicator())
           : _saleDetails == null
               ? const Center(child: Text('No details available.'))

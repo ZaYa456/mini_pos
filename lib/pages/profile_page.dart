@@ -24,6 +24,9 @@ class _ProfilePageState extends State<ProfilePage> {
   final _newPasswordController = TextEditingController();
   final _confirmNewPasswordController = TextEditingController();
 
+  bool _isUpdatingUsername = false;
+  bool _isUpdatingPassword = false;
+
   // URL endpoints for PHP files
   final String changeUsernameUrl =
       'http://192.168.1.4/mini_pos/backend/updateUsername.php';
@@ -32,15 +35,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Function to submit the username form
   Future<void> _changeUsername() async {
-    if (_newUsernameController.text != _confirmUsernameController.text) {
-      displayModal(context,
-          title: 'Error.',
-          message: 'The username\'s confirmation is not identical.',
-          backgroundColor: Colors.red);
-      return;
-    }
-
     try {
+      setState(() {
+        _isUpdatingUsername = true;
+      });
+      if (_newUsernameController.text != _confirmUsernameController.text) {
+        displayModal(context,
+            title: 'Error.',
+            message: 'The username\'s confirmation is not identical.',
+            backgroundColor: Colors.red);
+        return;
+      }
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(Uri.parse(changeUsernameUrl),
           body: json.encode({
@@ -73,20 +78,26 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       displayModal(context,
           title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    } finally {
+      setState(() {
+        _isUpdatingUsername = false;
+      });
     }
   }
 
   // Function to submit the password form
   Future<void> _changePassword() async {
-    if (_newPasswordController.text != _confirmNewPasswordController.text) {
-      displayModal(context,
-          title: 'Error.',
-          message: 'The password\'s confirmation is not identical.',
-          backgroundColor: Colors.red);
-      return;
-    }
-
+    setState(() {
+      _isUpdatingPassword = true;
+    });
     try {
+      if (_newPasswordController.text != _confirmNewPasswordController.text) {
+        displayModal(context,
+            title: 'Error.',
+            message: 'The password\'s confirmation is not identical.',
+            backgroundColor: Colors.red);
+        return;
+      }
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(Uri.parse(changePasswordUrl),
           body: json.encode({
@@ -119,6 +130,10 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       displayModal(context,
           title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    } finally {
+      setState(() {
+        _isUpdatingPassword = false;
+      });
     }
   }
 
@@ -136,7 +151,8 @@ class _ProfilePageState extends State<ProfilePage> {
               const Text('Change Username', style: TextStyle(fontSize: 18)),
               TextField(
                 controller: _currentUsernameController,
-                decoration: const InputDecoration(labelText: 'Current Username'),
+                decoration:
+                    const InputDecoration(labelText: 'Current Username'),
               ),
               TextField(
                 controller: _newUsernameController,
@@ -144,7 +160,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               TextField(
                 controller: _confirmUsernameController,
-                decoration: const InputDecoration(labelText: 'Confirm New Username'),
+                decoration:
+                    const InputDecoration(labelText: 'Confirm New Username'),
               ),
               TextField(
                 controller: _passwordForUsernameController,
@@ -152,10 +169,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 obscureText: true,
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _changeUsername,
-                child: const Text('Update Username'),
-              ),
+              _isUpdatingUsername
+                  ? const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: CircularProgressIndicator()),
+                    )
+                  : ElevatedButton(
+                      onPressed: _changeUsername,
+                      child: const Text('Update Username'),
+                    ),
               const Divider(),
 
               // Password change form
@@ -166,7 +191,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               TextField(
                 controller: _currentPasswordController,
-                decoration: const InputDecoration(labelText: 'Current Password'),
+                decoration:
+                    const InputDecoration(labelText: 'Current Password'),
                 obscureText: true,
               ),
               TextField(
@@ -176,14 +202,23 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               TextField(
                 controller: _confirmNewPasswordController,
-                decoration: const InputDecoration(labelText: 'Confirm New Password'),
+                decoration:
+                    const InputDecoration(labelText: 'Confirm New Password'),
                 obscureText: true,
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _changePassword,
-                child: const Text('Update Password'),
-              ),
+              _isUpdatingPassword
+                  ? const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: CircularProgressIndicator()),
+                    )
+                  : ElevatedButton(
+                      onPressed: _changePassword,
+                      child: const Text('Update Password'),
+                    ),
             ],
           ),
         ),

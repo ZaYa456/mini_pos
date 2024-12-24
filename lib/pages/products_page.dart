@@ -21,6 +21,7 @@ class _ProductsPageState extends State<ProductsPage> {
   ];
   String? _selectedCategory = "0";
   String _selectedSort = 'products_name';
+  bool _isLoadingProducts = false;
 
   ScrollController _scrollController = ScrollController();
   GlobalKey _filterKey = GlobalKey();
@@ -43,6 +44,10 @@ class _ProductsPageState extends State<ProductsPage> {
       String? categoryID = '0',
       String? sort = 'products_name'}) async {
     try {
+      setState(() {
+        _isLoadingProducts = true;
+      });
+
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
         Uri.parse('http://192.168.1.4/mini_pos/backend/getProducts.php'),
@@ -76,6 +81,10 @@ class _ProductsPageState extends State<ProductsPage> {
     } catch (e) {
       displayModal(context,
           title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    } finally {
+      setState(() {
+        _isLoadingProducts = false;
+      });
     }
   }
 
@@ -230,33 +239,38 @@ class _ProductsPageState extends State<ProductsPage> {
             ),
           ];
         },
-        body: _products.isEmpty
+        body: _isLoadingProducts
             ? const Center(
-                child: Text('No products found.'),
+                child: CircularProgressIndicator(),
               )
-            : ListView.builder(
-                itemCount: _products.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      // Navigate to AddOrUpdateProductForm with the productID
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddOrUpdateProductForm(
-                            productID: _products[index]
-                                ['id'], // Pass the productID
-                          ),
+            : _products.isEmpty
+                ? const Center(
+                    child: Text('No products found.'),
+                  )
+                : ListView.builder(
+                    itemCount: _products.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        splashColor: Colors.purple,
+                        onTap: () {
+                          // Navigate to AddOrUpdateProductForm with the productID
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddOrUpdateProductForm(
+                                productID: _products[index]
+                                    ['id'], // Pass the productID
+                              ),
+                            ),
+                          );
+                        },
+                        child: ListTile(
+                          title: Text(_products[index]['products_name']),
+                          subtitle: Text(
+                              'Price: \$${_products[index]['price']} - Category: ${_products[index]['category_name']}'),
                         ),
                       );
-                    },
-                    child: ListTile(
-                      title: Text(_products[index]['products_name']),
-                      subtitle: Text(
-                          'Price: \$${_products[index]['price']} - Category: ${_products[index]['category_name']}'),
-                    ),
-                  );
-                }),
+                    }),
       ),
     );
   }

@@ -18,6 +18,7 @@ class _SalesPageState extends State<SalesPage> {
   List _sales = [];
   DateTime? _selectedDatetime = DateTime.now();
   String _selectedSort = 'datetime';
+  bool _isLoadingSales = false;
 
   ScrollController _scrollController = ScrollController();
   GlobalKey _filterKey = GlobalKey();
@@ -39,6 +40,9 @@ class _SalesPageState extends State<SalesPage> {
 
   void fetchSales({String? datetime, String? sort = 'datetime'}) async {
     try {
+      setState(() {
+        _isLoadingSales = true;
+      });
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
         Uri.parse('http://192.168.1.4/mini_pos/backend/getSales.php'),
@@ -71,6 +75,10 @@ class _SalesPageState extends State<SalesPage> {
     } catch (e) {
       displayModal(context,
           title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    } finally {
+      setState(() {
+        _isLoadingSales = false;
+      });
     }
   }
 
@@ -179,31 +187,40 @@ class _SalesPageState extends State<SalesPage> {
             ),
           ];
         },
-        body: _sales.isEmpty
+        body: _isLoadingSales
             ? const Center(
-                child: Text('No sales found.'),
+                child: CircularProgressIndicator(),
               )
-            : ListView.builder(
-                itemCount: _sales.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              SaleDetailsPage(saleId: _sales[index]['id'], totalAmount: double.parse(_sales[index]['total_amount']), date: _sales[index]['date'], ),
+            : _sales.isEmpty
+                ? const Center(
+                    child: Text('No sales found.'),
+                  )
+                : ListView.builder(
+                    itemCount: _sales.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        splashColor: Colors.purple,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SaleDetailsPage(
+                                saleId: _sales[index]['id'],
+                                totalAmount:
+                                    double.parse(_sales[index]['total_amount']),
+                                date: _sales[index]['date'],
+                              ),
+                            ),
+                          );
+                        },
+                        child: ListTile(
+                          title: Text(_sales[index]['id'].toString()),
+                          subtitle: Text(
+                              'Total: \$${_sales[index]['total_amount']} - Date: ${_sales[index]['date']}'),
                         ),
                       );
                     },
-                    child: ListTile(
-                      title: Text(_sales[index]['id'].toString()),
-                      subtitle: Text(
-                          'Total: \$${_sales[index]['total_amount']} - Date: ${_sales[index]['date']}'),
-                    ),
-                  );
-                },
-              ),
+                  ),
       ),
     );
   }

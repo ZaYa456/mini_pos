@@ -16,6 +16,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final MobileScannerController controller = MobileScannerController();
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<Map<String, dynamic>> scannedProducts = [];
+  bool _isCheckingOut = false;
   bool isScanning = true;
   double total = 0.0;
 
@@ -221,6 +222,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> handleCheckout() async {
     try {
+      setState(() {
+        _isCheckingOut = true;
+      });
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
         Uri.parse('http://192.168.1.4/mini_pos/backend/checkout.php'),
@@ -253,6 +257,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
     } catch (e) {
       displayModal(context,
           title: 'Error.', message: '$e', backgroundColor: Colors.red);
+    } finally {
+      setState(() {
+        _isCheckingOut = false;
+      });
     }
   }
 
@@ -262,11 +270,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
       appBar: AppBar(
         title: const Text("Checkout"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check_circle),
-            onPressed: scannedProducts.isNotEmpty ? handleCheckout : null,
-            color: scannedProducts.isNotEmpty ? Colors.green : Colors.grey,
-          ),
+          _isCheckingOut
+              ? const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SizedBox(
+                      height: 30,
+                      width: 30,
+                      child: CircularProgressIndicator()),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.check_circle),
+                  onPressed: scannedProducts.isNotEmpty ? handleCheckout : null,
+                  color:
+                      scannedProducts.isNotEmpty ? Colors.green : Colors.grey,
+                ),
         ],
       ),
       body: Column(

@@ -33,15 +33,14 @@ class _LoginPageState extends State<LoginPage> {
       TextEditingController(text: 'zak');
   final TextEditingController _passwordController =
       TextEditingController(text: 'zak');
-  bool _isLoading = false;
+  bool _isLoggingIn = false;
 
   Future<void> login() async {
+    setState(() {
+      _isLoggingIn = true;
+    });
     const url = 'http://192.168.1.4/mini_pos/backend/login.php';
     try {
-      setState(() {
-        _isLoading = true;
-      });
-
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
@@ -79,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
           title: 'Error.', message: '$e', backgroundColor: Colors.red);
     } finally {
       setState(() {
-        _isLoading = false;
+        _isLoggingIn = false;
       });
     }
   }
@@ -140,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
-                _isLoading
+                _isLoggingIn
                     ? const Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: CircularProgressIndicator(),
