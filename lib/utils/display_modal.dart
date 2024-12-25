@@ -5,6 +5,7 @@ Future<void> displayModal(
   required String title,
   required String message,
   Color backgroundColor = Colors.white,
+  Color foregroundColor = Colors.white,
   bool confirmation = false,
   VoidCallback? confirmationFunction,
 }) async {
@@ -16,9 +17,9 @@ Future<void> displayModal(
       return AlertDialog(
         backgroundColor: backgroundColor,
         title: Text(title,
-            style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Text(message, style: const TextStyle(color: Colors.white)),
+            style:
+                TextStyle(color: foregroundColor, fontWeight: FontWeight.bold)),
+        content: Text(message, style: TextStyle(color: foregroundColor)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         actions: confirmation
             ? [
@@ -26,7 +27,7 @@ Future<void> displayModal(
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog
                   },
-                  child: const Text('No', style: TextStyle(color: Colors.grey)),
+                  child: Text('No', style: TextStyle(color: foregroundColor)),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -38,7 +39,10 @@ Future<void> displayModal(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  child: const Text('Yes'),
+                  child: Text(
+                    'Yes',
+                    style: TextStyle(color: backgroundColor),
+                  ),
                 ),
               ]
             : [
@@ -47,7 +51,7 @@ Future<void> displayModal(
                     Navigator.of(context).pop(); // Close the dialog
                   },
                   child:
-                      const Text('Close', style: TextStyle(color: Colors.white)),
+                      Text('Close', style: TextStyle(color: foregroundColor)),
                 ),
               ],
       );

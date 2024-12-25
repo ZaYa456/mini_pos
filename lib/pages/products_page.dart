@@ -67,20 +67,26 @@ class _ProductsPageState extends State<ProductsPage> {
             _products = data['products'];
           });
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: data['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: data['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     } finally {
       setState(() {
         _isLoadingProducts = false;
@@ -102,20 +108,26 @@ class _ProductsPageState extends State<ProductsPage> {
                 {"id": category['id'], "name": category['name']}));
           });
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: data['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: data['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     }
   }
 
@@ -136,7 +148,7 @@ class _ProductsPageState extends State<ProductsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Products'),
+        title: Text('Products (${_products.length})'),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),

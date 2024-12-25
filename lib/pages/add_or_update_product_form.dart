@@ -64,20 +64,26 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
             _categories = data['categories'];
           });
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: data['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: data['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     }
   }
 
@@ -101,20 +107,26 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
             _selectedCategory = data['product']['category_id'].toString();
           });
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: data['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: data['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     } finally {
       setState(() {
         _isLoadingProductInfo = false;
@@ -162,26 +174,32 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
         if (response.statusCode == 200) {
           var result = json.decode(response.body);
           // Handle successful submission
-          if (result['success'] == true) {
+          if (result['success'] == true && mounted) {
             displayModal(context,
                 title: 'Success.',
                 message: result['message'],
                 backgroundColor: Colors.green);
           } else {
-            displayModal(context,
+            if(mounted) {
+              displayModal(context,
                 title: 'Error.',
                 message: result['message'],
                 backgroundColor: Colors.red);
+            }
           }
         } else {
-          displayModal(context,
+          if(mounted) {
+            displayModal(context,
               title: 'Server Error: ${response.statusCode}',
               message: response.body,
               backgroundColor: Colors.red);
+          }
         }
       } catch (e) {
-        displayModal(context,
+        if(mounted) {
+          displayModal(context,
             title: 'Error.', message: '$e', backgroundColor: Colors.red);
+        }
       } finally {
         setState(() {
           _isSubmitting = false;

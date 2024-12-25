@@ -61,20 +61,26 @@ class _SalesPageState extends State<SalesPage> {
             _sales = data['sales'];
           });
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: data['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: data['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     } finally {
       setState(() {
         _isLoadingSales = false;
@@ -117,7 +123,7 @@ class _SalesPageState extends State<SalesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sales'),
+        title: Text('Sales (${_sales.length})'),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),

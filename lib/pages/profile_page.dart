@@ -40,10 +40,12 @@ class _ProfilePageState extends State<ProfilePage> {
         _isUpdatingUsername = true;
       });
       if (_newUsernameController.text != _confirmUsernameController.text) {
-        displayModal(context,
-            title: 'Error.',
-            message: 'The username\'s confirmation is not identical.',
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Error.',
+              message: 'The username\'s confirmation is not identical.',
+              backgroundColor: Colors.red);
+        }
         return;
       }
       String sessionId = await getSessionId() ?? '';
@@ -59,25 +61,33 @@ class _ProfilePageState extends State<ProfilePage> {
         var result = json.decode(response.body);
         // Handle successful submission
         if (result['success'] == true) {
-          displayModal(context,
-              title: 'Success.',
-              message: result['message'],
-              backgroundColor: Colors.green);
+          if (mounted) {
+            displayModal(context,
+                title: 'Success.',
+                message: result['message'],
+                backgroundColor: Colors.green);
+          }
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: result['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: result['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     } finally {
       setState(() {
         _isUpdatingUsername = false;
@@ -92,10 +102,12 @@ class _ProfilePageState extends State<ProfilePage> {
     });
     try {
       if (_newPasswordController.text != _confirmNewPasswordController.text) {
-        displayModal(context,
-            title: 'Error.',
-            message: 'The password\'s confirmation is not identical.',
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Error.',
+              message: 'The password\'s confirmation is not identical.',
+              backgroundColor: Colors.red);
+        }
         return;
       }
       String sessionId = await getSessionId() ?? '';
@@ -111,25 +123,33 @@ class _ProfilePageState extends State<ProfilePage> {
         var result = json.decode(response.body);
         // Handle successful submission
         if (result['success'] == true) {
-          displayModal(context,
-              title: 'Success.',
-              message: result['message'],
-              backgroundColor: Colors.green);
+          if (mounted) {
+            displayModal(context,
+                title: 'Success.',
+                message: result['message'],
+                backgroundColor: Colors.green);
+          }
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: result['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: result['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     } finally {
       setState(() {
         _isUpdatingPassword = false;

@@ -49,21 +49,27 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
             _saleDetails = List<Map<String, dynamic>>.from(data['sale']);
           });
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: data['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: data['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
-    }finally {
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
+    } finally {
       setState(() {
         _isLoadingSaleDetails = false;
       });
@@ -91,7 +97,8 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                       Text('Date: ${widget.date}',
                           style: Theme.of(context).textTheme.headlineSmall),
                       const SizedBox(height: 8.0),
-                      Text('Total Amount: \$${widget.totalAmount.toStringAsFixed(2)}',
+                      Text(
+                          'Total Amount: \$${widget.totalAmount.toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.headlineSmall),
                       const Divider(height: 20.0),
                       Text('Items:',

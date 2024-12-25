@@ -85,24 +85,30 @@ class _CheckoutPageState extends State<CheckoutPage> {
           // Trigger the flash blink animation
           blinkFlash();
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: data['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: data['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
 
       // Add a short delay before resuming scanning
       await Future.delayed(const Duration(seconds: 1));
       setState(() => isScanning = true); // Resume scanning after delay
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     }
   }
 
@@ -238,25 +244,33 @@ class _CheckoutPageState extends State<CheckoutPage> {
         if (data['success'] == true) {
           // Uncomment the following statement if you prefer to clear the products list on successful checkout
           // removeAllProducts();
-          displayModal(context,
-              title: 'Success.',
-              message: data['message'],
-              backgroundColor: Colors.green);
+          if (mounted) {
+            displayModal(context,
+                title: 'Success.',
+                message: data['message'],
+                backgroundColor: Colors.green);
+          }
         } else {
-          displayModal(context,
-              title: 'Error.',
-              message: data['message'],
-              backgroundColor: Colors.red);
+          if (mounted) {
+            displayModal(context,
+                title: 'Error.',
+                message: data['message'],
+                backgroundColor: Colors.red);
+          }
         }
       } else {
-        displayModal(context,
-            title: 'Server Error: ${response.statusCode}',
-            message: response.body,
-            backgroundColor: Colors.red);
+        if (mounted) {
+          displayModal(context,
+              title: 'Server Error: ${response.statusCode}',
+              message: response.body,
+              backgroundColor: Colors.red);
+        }
       }
     } catch (e) {
-      displayModal(context,
-          title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      if (mounted) {
+        displayModal(context,
+            title: 'Error.', message: '$e', backgroundColor: Colors.red);
+      }
     } finally {
       setState(() {
         _isCheckingOut = false;
