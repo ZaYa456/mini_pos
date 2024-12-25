@@ -142,6 +142,24 @@ class _ProductsPageState extends State<ProductsPage> {
             icon: const Icon(Icons.filter_list),
             onPressed: scrollToFilter, // Scroll to filter section
           ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              // Navigate to the AddOrUpdateProductForm page
+              final refresh = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AddOrUpdateProductForm()),
+              );
+              if (refresh == true) {
+                fetchProducts(
+                    search: '',
+                    categoryID: _selectedCategory,
+                    sort: _selectedSort);
+              }
+            },
+            tooltip: 'Add Product',
+          ),
         ],
       ),
       body: NestedScrollView(
@@ -252,9 +270,9 @@ class _ProductsPageState extends State<ProductsPage> {
                     itemBuilder: (context, index) {
                       return InkWell(
                         splashColor: Colors.purple,
-                        onTap: () {
+                        onTap: () async {
                           // Navigate to AddOrUpdateProductForm with the productID
-                          Navigator.push(
+                          final refresh = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => AddOrUpdateProductForm(
@@ -263,6 +281,12 @@ class _ProductsPageState extends State<ProductsPage> {
                               ),
                             ),
                           );
+                          if (refresh == true) {
+                            fetchProducts(
+                                search: '',
+                                categoryID: _selectedCategory,
+                                sort: _selectedSort);
+                          }
                         },
                         child: ListTile(
                           title: Text(_products[index]['products_name']),

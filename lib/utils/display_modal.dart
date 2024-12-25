@@ -47,7 +47,7 @@ Future<void> displayModal(
                     Navigator.of(context).pop(); // Close the dialog
                   },
                   child:
-                      const Text('Close', style: TextStyle(color: Colors.grey)),
+                      const Text('Close', style: TextStyle(color: Colors.white)),
                 ),
               ],
       );

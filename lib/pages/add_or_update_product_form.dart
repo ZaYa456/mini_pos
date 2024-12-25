@@ -44,7 +44,9 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
   Future<void> _scanBarcode() async {
     var result = await BarcodeScanner.scan();
     setState(() {
-      _barcodeController.text = result.rawContent;
+      _barcodeController.text = (result.rawContent.isEmpty)
+          ? _barcodeController.text
+          : result.rawContent;
     });
   }
 
@@ -134,6 +136,11 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
         'categoryID': _selectedCategory,
       };
 
+      // If the productID is not null, add it to the data
+      if (widget.productID != null) {
+        data['productID'] = widget.productID.toString();
+      }
+
       // Set the PHP endpoint
       var url = Uri.parse(
           'http://192.168.1.4/mini_pos/backend/addOrUpdateProduct.php');
@@ -189,6 +196,16 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
       appBar: AppBar(
         title:
             Text((widget.productID == null) ? 'Add Product' : 'Update Product'),
+        /* Even though Flutter adds the leading back arrow button by default,
+        I want to customize it to send a signal back to the products page
+        in order to refresh the products list
+        */
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
+        ),
       ),
       body: _isLoadingProductInfo
           ? const Center(
@@ -256,12 +273,16 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: _barcodeController,
+                        readOnly: (widget.productID == null) ? false : true,
                         decoration: InputDecoration(
                             labelText: 'Barcode',
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.qr_code_scanner),
-                              onPressed: _scanBarcode,
-                            )),
+                            suffixIcon: (widget.productID != null)
+                                ? null
+                                : IconButton(
+                                    icon: const Icon(Icons.qr_code_scanner),
+                                    onPressed: _scanBarcode,
+                                  )),
+                        enabled: (widget.productID == null) ? true : false,
                         validator: (value) => value!.isEmpty
                             ? 'Please enter the product\'s barcode'
                             : null,
