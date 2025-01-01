@@ -37,7 +37,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
       });
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
-        Uri.parse('http://192.168.1.4/mini_pos/backend/getSales.php'),
+        Uri.parse('http://192.168.1.6/mini_pos/backend/getSales.php'),
         body: jsonEncode({'sessionId': sessionId, 'saleID': widget.saleId}),
         headers: {'Content-Type': 'application/json'},
       );

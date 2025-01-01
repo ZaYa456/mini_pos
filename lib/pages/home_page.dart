@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
         }
         return;
       }
-      const url = 'http://192.168.1.4/mini_pos/backend/logout.php';
+      const url = 'http://192.168.1.6/mini_pos/backend/logout.php';
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},

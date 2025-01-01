@@ -54,7 +54,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
   Future<void> fetchCategories() async {
     try {
       var url =
-          Uri.parse('http://192.168.1.4/mini_pos/backend/getCategories.php');
+          Uri.parse('http://192.168.1.6/mini_pos/backend/getCategories.php');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -94,7 +94,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
       });
       String sessionId = await getSessionId() ?? '';
       var url =
-          Uri.parse('http://192.168.1.4/mini_pos/backend/getProducts.php');
+          Uri.parse('http://192.168.1.6/mini_pos/backend/getProducts.php');
       final response = await http.post(url,
           body: json.encode({'sessionId': sessionId, 'productID': productID}));
       if (response.statusCode == 200) {
@@ -155,7 +155,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
 
       // Set the PHP endpoint
       var url = Uri.parse(
-          'http://192.168.1.4/mini_pos/backend/addOrUpdateProduct.php');
+          'http://192.168.1.6/mini_pos/backend/addOrUpdateProduct.php');
 
       try {
         setState(() {
@@ -229,7 +229,8 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : GestureDetector(
+          : InkWell(
+            splashColor: Colors.transparent,
               onTap: () => FocusScope.of(context)
                   .unfocus(), // Dismiss the keyboard when the user taps outside the form
               child: Padding(

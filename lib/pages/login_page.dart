@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
       _isLoggingIn = true;
     });
     try {
-      const url = 'http://192.168.1.4/mini_pos/backend/login.php';
+      const url = 'http://192.168.1.6/mini_pos/backend/login.php';
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
