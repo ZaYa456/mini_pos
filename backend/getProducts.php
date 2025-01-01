@@ -21,7 +21,7 @@ try {
 
         $errors = [];
         // Sanitize inputs
-        $search = "%" . testInput($data["search"]) . "%";
+        $search = testInput($data["search"]) . "%";
         $categoryID = testInput($data["categoryID"]);
         $sort = testInput($data["sort"]);
 

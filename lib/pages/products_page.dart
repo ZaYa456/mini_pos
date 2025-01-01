@@ -16,7 +16,8 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> {
   List _products = [];
-  List<Map> _categories = [
+  TextEditingController _searchController = TextEditingController();
+  List<dynamic> _categories = [
     {"id": 0, "name": "All Categories"}
   ];
   String? _selectedCategory = "0";
@@ -186,6 +187,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: TextField(
+                      controller: _searchController,
                       onChanged: (value) {
                         fetchProducts(
                             search: value,
@@ -211,7 +213,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                 _selectedCategory = newValue!;
                               });
                               fetchProducts(
-                                  search: '',
+                                  search: _searchController.text,
                                   categoryID: newValue,
                                   sort: _selectedSort);
                             },
@@ -244,7 +246,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                 _selectedSort = newValue!;
                               });
                               fetchProducts(
-                                  search: '',
+                                  search: _searchController.text,
                                   categoryID: _selectedCategory,
                                   sort: newValue);
                             },

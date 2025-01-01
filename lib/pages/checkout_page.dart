@@ -102,7 +102,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       }
 
       // Add a short delay before resuming scanning
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 2));
       setState(() => isScanning = true); // Resume scanning after delay
     } catch (e) {
       if (mounted) {
