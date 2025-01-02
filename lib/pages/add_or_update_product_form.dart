@@ -230,7 +230,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
               child: CircularProgressIndicator(),
             )
           : InkWell(
-            splashColor: Colors.transparent,
+            splashColor: Colors.purple,
               onTap: () => FocusScope.of(context)
                   .unfocus(), // Dismiss the keyboard when the user taps outside the form
               child: Padding(
