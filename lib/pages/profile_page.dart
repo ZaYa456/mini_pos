@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mini_pos/utils/ip_address.dart';
 import 'dart:convert';
 import '../session_management/session_getter.dart';
 import '../utils/display_modal.dart';
@@ -29,9 +30,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // URL endpoints for PHP files
   final String changeUsernameUrl =
-      'http://192.168.1.6/mini_pos/backend/updateUsername.php';
+      'http://$ipAddress/mini_pos/backend/updateUsername.php';
   final String changePasswordUrl =
-      'http://192.168.1.6/mini_pos/backend/updatePassword.php';
+      'http://$ipAddress/mini_pos/backend/updatePassword.php';
 
   // Function to submit the username form
   Future<void> _changeUsername() async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mini_pos/utils/ip_address.dart';
 import 'dart:convert'; // For json.decode
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/display_modal.dart';
@@ -25,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
       _isLoggingIn = true;
     });
     try {
-      const url = 'http://192.168.1.6/mini_pos/backend/login.php';
+      const url = 'http://$ipAddress/mini_pos/backend/login.php';
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},

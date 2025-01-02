@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mini_pos/utils/ip_address.dart';
 import 'login_page.dart';
 import 'dart:convert';
 import 'products_page.dart';
@@ -50,7 +51,7 @@ class _HomePageState extends State<HomePage> {
         }
         return;
       }
-      const url = 'http://192.168.1.6/mini_pos/backend/logout.php';
+      const url = 'http://$ipAddress/mini_pos/backend/logout.php';
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},

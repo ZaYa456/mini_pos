@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:mini_pos/session_management/session_getter.dart';
+import 'package:mini_pos/utils/ip_address.dart';
 
 import '../utils/display_modal.dart';
 import 'add_or_update_product_form.dart';
@@ -51,7 +52,7 @@ class _ProductsPageState extends State<ProductsPage> {
 
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
-        Uri.parse('http://192.168.1.6/mini_pos/backend/getProducts.php'),
+        Uri.parse('http://$ipAddress/mini_pos/backend/getProducts.php'),
         body: jsonEncode({
           'sessionId': sessionId,
           'search': search,
@@ -98,7 +99,7 @@ class _ProductsPageState extends State<ProductsPage> {
   Future<void> fetchCategories() async {
     try {
       var url =
-          Uri.parse('http://192.168.1.6/mini_pos/backend/getCategories.php');
+          Uri.parse('http://$ipAddress/mini_pos/backend/getCategories.php');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {

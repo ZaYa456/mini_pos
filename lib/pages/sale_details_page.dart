@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mini_pos/utils/ip_address.dart';
 import 'dart:convert';
 
 import '../session_management/session_getter.dart';
@@ -37,7 +38,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
       });
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
-        Uri.parse('http://192.168.1.6/mini_pos/backend/getSales.php'),
+        Uri.parse('http://$ipAddress/mini_pos/backend/getSales.php'),
         body: jsonEncode({'sessionId': sessionId, 'saleID': widget.saleId}),
         headers: {'Content-Type': 'application/json'},
       );

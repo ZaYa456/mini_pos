@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:mini_pos/session_management/session_getter.dart';
+import 'package:mini_pos/utils/ip_address.dart';
 
 import '../utils/display_modal.dart';
 import 'sale_details_page.dart';
@@ -45,7 +46,7 @@ class _SalesPageState extends State<SalesPage> {
       });
       String sessionId = await getSessionId() ?? '';
       final response = await http.post(
-        Uri.parse('http://192.168.1.6/mini_pos/backend/getSales.php'),
+        Uri.parse('http://$ipAddress/mini_pos/backend/getSales.php'),
         body: jsonEncode({
           'sessionId': sessionId,
           'datetime': datetime ?? '',

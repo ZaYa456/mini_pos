@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:mini_pos/utils/ip_address.dart';
 
 import '../session_management/session_getter.dart';
 import '../utils/display_modal.dart';
@@ -54,7 +55,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
   Future<void> fetchCategories() async {
     try {
       var url =
-          Uri.parse('http://192.168.1.6/mini_pos/backend/getCategories.php');
+          Uri.parse('http://$ipAddress/mini_pos/backend/getCategories.php');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -94,7 +95,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
       });
       String sessionId = await getSessionId() ?? '';
       var url =
-          Uri.parse('http://192.168.1.6/mini_pos/backend/getProducts.php');
+          Uri.parse('http://$ipAddress/mini_pos/backend/getProducts.php');
       final response = await http.post(url,
           body: json.encode({'sessionId': sessionId, 'productID': productID}));
       if (response.statusCode == 200) {
@@ -155,7 +156,7 @@ class _AddOrUpdateProductFormState extends State<AddOrUpdateProductForm> {
 
       // Set the PHP endpoint
       var url = Uri.parse(
-          'http://192.168.1.6/mini_pos/backend/addOrUpdateProduct.php');
+          'http://$ipAddress/mini_pos/backend/addOrUpdateProduct.php');
 
       try {
         setState(() {

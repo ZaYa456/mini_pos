@@ -41,6 +41,8 @@ try {
         checkLogin($conn, $username, $password);
 
         echo json_encode(["message" => "Invalid username or password!", "success" => false]);
+    } else {
+        echo json_encode(["message" => "Please fill all fields!", "success" => false]);
     }
 } catch (Exception $e) {
     echo json_encode(["message" => "Error: " . $e->getMessage(), "success" => false]);
